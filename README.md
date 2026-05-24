@@ -1,6 +1,6 @@
 # Avtive UI - Multi-Org Data Transfer System
 
-Live Preview: https://avtive-855nufokf-labib-7610s-projects.vercel.app/
+Live Preview: https://avtive-ui.vercel.app/
 
 ## How To Run This Project
 
