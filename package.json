@@ -11,12 +11,12 @@
     "db:seed": "tsx scripts/seed.ts",
     "start": "next start",
     "lint": "eslint",
-    "test:auth": "jest __tests__/auth",
-    "test:lib": "jest __tests__/lib",
-    "test:onboard": "jest __tests__/onboard",
-    "test": "jest",
-    "test:smoke": "jest __tests__/smoke",
-    "test:transfer": "jest __tests__/transfer",
+    "test:auth": "NODE_ENV=test jest __tests__/auth",
+    "test:lib": "NODE_ENV=test jest __tests__/lib",
+    "test:onboard": "NODE_ENV=test jest __tests__/onboard",
+    "test": "NODE_ENV=test jest",
+    "test:smoke": "NODE_ENV=test jest __tests__/smoke",
+    "test:transfer": "NODE_ENV=test jest __tests__/transfer",
     "test:watch": "jest --watch"
   },
   "dependencies": {
