@@ -1,10 +1,11 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import RootLayout, { metadata } from "@/app/layout";
-import { DemoSessionProvider } from "@/app/providers/demoSessionProvider";
 import HomePage from "@/app/page";
-import LoginPage from "@/app/login/page";
+import { LoginFormCard } from "@/components/login/loginFormCard";
+import { OnboardingFormCard } from "@/components/onboard/onboardingFormCard";
+import { TransferWorkspace } from "@/components/transfer/transferWorkspace";
 
 const mockPush = jest.fn();
 const mockReplace = jest.fn();
@@ -25,24 +26,58 @@ describe("App smoke tests", () => {
     mockRedirect.mockReset();
   });
 
-  it("renders the login page and submits to the transfer route", () => {
+  it("renders the login email step", () => {
     render(
-      <DemoSessionProvider>
-        <LoginPage />
-      </DemoSessionProvider>,
+      <LoginFormCard
+        email=""
+        error=""
+        isOtpStep={false}
+        requestOtpPath="/api/auth/request-otp"
+        success=""
+        verifyOtpPath="/api/auth/verify-otp"
+      />,
     );
 
     expect(screen.getByRole("heading", { name: /secure login/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /send login code/i })).toBeInTheDocument();
+  });
 
-    fireEvent.change(screen.getByLabelText(/email address/i), {
-      target: { value: "name@company.com" },
-    });
-    fireEvent.change(screen.getByLabelText(/password/i), {
-      target: { value: "topsecret" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /login and continue/i }));
+  it("renders the organization onboarding option", () => {
+    render(<OnboardingFormCard actionPath="/api/onboard" error="" />);
 
-    expect(mockPush).toHaveBeenCalledWith("/transfer");
+    expect(screen.getByRole("heading", { name: /onboard organization/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /create organization/i })).toBeInTheDocument();
+  });
+
+  it("renders the transfer workspace", () => {
+    render(
+      <TransferWorkspace
+        addRowPath="/api/transfer/add-row"
+        deleteRowPath="/api/transfer/delete-row"
+        email="org-a@example.com"
+        error=""
+        logoutPath="/api/auth/logout"
+        organizationName="Organization A"
+        recipients={[{ id: "org-b", name: "Organization B" }]}
+        rows={[
+          {
+            id: "row-1",
+            organizationId: "org-a",
+            fieldOne: "one",
+            fieldTwo: "two",
+            fieldThree: "three",
+            sourceTransferId: null,
+            deletedAt: null,
+            createdAt: new Date(),
+          },
+        ]}
+        success=""
+        transferRowsPath="/api/transfer/submit"
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: /transfer data/i })).toBeInTheDocument();
+    expect(screen.getByText(/1 visible rows/i)).toBeInTheDocument();
   });
 
   it("redirects the home route to login", () => {

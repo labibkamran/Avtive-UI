@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 type SecurePortalShellProps = {
   email: string;
   children: React.ReactNode;
-  onLogout: () => void;
+  logoutPath: string;
+  organizationName: string;
 };
 
 export function SecurePortalShell({
   email,
   children,
-  onLogout,
+  logoutPath,
+  organizationName,
 }: SecurePortalShellProps) {
   return (
     <div className="mx-auto flex w-full max-w-[1050px] flex-col gap-4 px-4 py-5 sm:px-6 sm:py-9">
@@ -22,19 +24,21 @@ export function SecurePortalShell({
             Secure Workspace
           </div>
           <div>
-            <p className="text-[21px] font-semibold text-foreground">Secure Data Portal</p>
+            <p className="text-[21px] font-semibold text-foreground">{organizationName}</p>
             <p className="text-sm text-muted-foreground">Signed in as {email}</p>
           </div>
         </div>
 
-        <Button
-          variant="ghost"
-          className="h-11 rounded-xl border border-border bg-transparent px-4 text-foreground hover:bg-white/5"
-          onClick={onLogout}
-        >
-          <LogOut className="size-4" />
-          Logout
-        </Button>
+        <form action={logoutPath} method="post">
+          <Button
+            type="submit"
+            variant="ghost"
+            className="h-11 rounded-xl border border-border bg-transparent px-4 text-foreground hover:bg-white/5"
+          >
+            <LogOut className="size-4" />
+            Logout
+          </Button>
+        </form>
       </header>
 
       <main className="rounded-[18px] border border-border bg-[linear-gradient(180deg,_#1b2650,_#141f43)] p-6 shadow-[0_20px_50px_rgb(0_0_0_/_28%)] sm:p-8">

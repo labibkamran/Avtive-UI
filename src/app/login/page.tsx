@@ -1,36 +1,36 @@
-"use client";
-
-import { type FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
-
-import { useDemoSession } from "@/app/providers/demoSessionProvider";
+import { getSession } from "@/lib/auth/session";
 import { LoginFormCard } from "@/components/login/loginFormCard";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const router = useRouter();
-  const { signIn } = useDemoSession();
+type LoginPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+function getSearchValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
 
-    if (!email.trim()) {
-      return;
-    }
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const session = await getSession();
 
-    signIn(email);
-    setPassword("");
-    router.push("/transfer");
-  };
+  if (session) {
+    redirect("/transfer");
+  }
+
+  const params = (await searchParams) ?? {};
+  const email = getSearchValue(params.email) ?? "";
+  const error = getSearchValue(params.error) ?? "";
+  const success = getSearchValue(params.success) ?? "";
+  const sent = getSearchValue(params.sent) === "1";
 
   return (
     <LoginFormCard
       email={email}
-      password={password}
-      onEmailChange={setEmail}
-      onPasswordChange={setPassword}
-      onSubmit={handleSubmit}
+      error={error}
+      isOtpStep={sent}
+      requestOtpPath="/api/auth/request-otp"
+      success={success}
+      verifyOtpPath="/api/auth/verify-otp"
     />
   );
 }

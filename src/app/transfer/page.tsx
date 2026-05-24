@@ -1,35 +1,34 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-
-import { useDemoSession } from "@/app/providers/demoSessionProvider";
+import { requireSession } from "@/lib/auth/session";
+import { getVisibleRowsForOrganization } from "@/lib/dataRows";
+import { getTransferRecipientOrganizations } from "@/lib/organizations";
 import { TransferWorkspace } from "@/components/transfer/transferWorkspace";
 
-export default function TransferPage() {
-  const router = useRouter();
-  const { email, signOut } = useDemoSession();
-  const [message, setMessage] = useState("");
+type TransferPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  useEffect(() => {
-    if (!email) {
-      router.replace("/login");
-    }
-  }, [email, router]);
+function getSearchValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
 
-  if (!email) {
-    return null;
-  }
+export default async function TransferPage({ searchParams }: TransferPageProps) {
+  const session = await requireSession();
+  const rows = await getVisibleRowsForOrganization(session.organizationId);
+  const recipients = await getTransferRecipientOrganizations(session.organizationId);
+  const params = (await searchParams) ?? {};
 
   return (
     <TransferWorkspace
-      email={email}
-      message={message}
-      onLogout={() => {
-        signOut();
-        router.push("/login");
-      }}
-      onTransfer={() => setMessage("Data transferred successfully.")}
+      addRowPath="/api/transfer/add-row"
+      deleteRowPath="/api/transfer/delete-row"
+      email={session.email}
+      error={getSearchValue(params.error) ?? ""}
+      logoutPath="/api/auth/logout"
+      organizationName={session.organizationName}
+      recipients={recipients}
+      rows={rows}
+      success={getSearchValue(params.success) ?? ""}
+      transferRowsPath="/api/transfer/submit"
     />
   );
 }

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { DemoSessionProvider } from "@/app/providers/demoSessionProvider";
-
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +30,7 @@ export default function RootLayout({
       className={cn("dark h-full font-sans antialiased", geistSans.variable, geistMono.variable)}
     >
       <body className="min-h-full bg-[radial-gradient(circle_at_10%_10%,_#1a2962_0%,_var(--background)_40%,_#070c20_100%)] text-foreground">
-        <DemoSessionProvider>{children}</DemoSessionProvider>
+        {children}
       </body>
     </html>
   );
